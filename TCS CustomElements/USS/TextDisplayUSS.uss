@@ -1,0 +1,11 @@
+.textDisplay {
+    -unity-font-style: bold;
+    flex-direction: row;
+    font-size: 100%;
+}
+
+.textDisplay_header {
+}
+
+.textDisplay_context {
+}
