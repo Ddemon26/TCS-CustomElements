@@ -50,6 +50,11 @@ namespace Source.UIToolkit.Elements {
             child1.AddToClassList(ContainerUssClassName);
             hierarchy.Add(child1);
             RegisterCallback(new EventCallback<GeometryChangedEvent>(OnGeometryChanged));
+            
+            ColorValue = new Color(1.0f, 0.0f, 0.0f);
+            LowValue = 0f;
+            HighValue = 100f;
+            value = 50f;
         }
 
 

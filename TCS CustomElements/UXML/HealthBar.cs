@@ -20,7 +20,7 @@ namespace Source.UIToolkit.Elements {
         readonly VisualElement m_background;
         public VisualElement m_progress;
         readonly Label m_title;
-        
+
         float m_lowValue;
         float m_highValue = 100f;
         float m_value;
@@ -50,9 +50,17 @@ namespace Source.UIToolkit.Elements {
             child1.AddToClassList(ContainerUssClassName);
             hierarchy.Add(child1);
             RegisterCallback(new EventCallback<GeometryChangedEvent>(OnGeometryChanged));
+            
+            ColorValue = new Color(1.0f, 0.0f, 0.0f);
+            LowValue = 0f;
+            HighValue = 100f;
+            value = 50f;
         }
-
-
+        
+        void OnGeometryChanged(GeometryChangedEvent e) {
+            SetProgress(value);
+        }
+        
         [CreateProperty, UxmlAttribute("title")] public string Title {
             get => m_title.text;
             set {
@@ -93,20 +101,22 @@ namespace Source.UIToolkit.Elements {
                 NotifyPropertyChanged(HighValueProperty);
             }
         }
-        
+
         void SetProgress(float p) {
             if (p <= LowValue) {
                 m_progress.style.display = DisplayStyle.None;
-            } else {
+            }
+            else {
                 m_progress.style.display = DisplayStyle.Flex;
                 float progressWidth = CalculateProgressWidth(p >= LowValue ? (p <= HighValue ? p : HighValue) : LowValue);
                 if (progressWidth < 0.0) {
                     return;
                 }
+
                 m_progress.style.right = progressWidth;
             }
         }
-        
+
         float CalculateProgressWidth(float width) {
             if (m_background == null || m_progress == null) {
                 return 0.0f;
@@ -120,10 +130,6 @@ namespace Source.UIToolkit.Elements {
             backgroundLayout = m_background.layout;
             float num = backgroundLayout.width - 2f;
             return num - Mathf.Max(num * width / HighValue, 1f);
-        }
-
-        void OnGeometryChanged(GeometryChangedEvent e) {
-            SetProgress(value);
         }
 
         [CreateProperty, UxmlAttribute("value")] public float value {
@@ -150,7 +156,7 @@ namespace Source.UIToolkit.Elements {
             m_value = newValue;
             SetProgress(value);
         }
-        
+
         [CreateProperty, UxmlAttribute("color-value")] public Color ColorValue {
             get => m_progress.resolvedStyle.backgroundColor;
             set {

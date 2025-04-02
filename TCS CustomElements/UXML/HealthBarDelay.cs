@@ -59,10 +59,17 @@ namespace Source.UIToolkit.Elements {
             child1.AddToClassList(ContainerUssClassName);
             hierarchy.Add(child1);
             RegisterCallback(new EventCallback<GeometryChangedEvent>(OnGeometryChanged));
+            
+            ColorValue = new Color(1.0f, 0.0f, 0.0f);
+            LowValue = 0f;
+            HighValue = 100f;
+            value = 50f;
+            
+            ColorDelayValue = new Color(0.0f, 1.0f, 0.0f);
+            DelayedValue = 50f;
         }
 
-        [CreateProperty, UxmlAttribute("title")]
-        public string Title {
+        [CreateProperty, UxmlAttribute("title")] public string Title {
             get => m_title.text;
             set {
                 string title = Title;
@@ -75,8 +82,7 @@ namespace Source.UIToolkit.Elements {
             }
         }
 
-        [CreateProperty, UxmlAttribute("low-value")]
-        public float LowValue {
+        [CreateProperty, UxmlAttribute("low-value")] public float LowValue {
             get => m_lowValue;
             set {
                 float lowValue = LowValue;
@@ -90,8 +96,7 @@ namespace Source.UIToolkit.Elements {
             }
         }
 
-        [CreateProperty, UxmlAttribute("high-value")]
-        public float HighValue {
+        [CreateProperty, UxmlAttribute("high-value")] public float HighValue {
             get => m_highValue;
             set {
                 float highValue = HighValue;
@@ -155,8 +160,7 @@ namespace Source.UIToolkit.Elements {
             SetDelayedProgress(DelayedValue);
         }
 
-        [CreateProperty, UxmlAttribute("value")]
-        public float value {
+        [CreateProperty, UxmlAttribute("value")] public float value {
             get => m_value;
             set {
                 if (EqualityComparer<float>.Default.Equals(m_value, value)) {
@@ -176,8 +180,7 @@ namespace Source.UIToolkit.Elements {
             }
         }
 
-        [CreateProperty, UxmlAttribute("delayed-value")]
-        public float DelayedValue {
+        [CreateProperty, UxmlAttribute("delayed-value")] public float DelayedValue {
             get => m_delayedValue;
             set {
                 if (EqualityComparer<float>.Default.Equals(m_delayedValue, value)) {
