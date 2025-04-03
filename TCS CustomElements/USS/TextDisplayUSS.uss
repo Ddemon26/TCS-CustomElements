@@ -1,11 +1,41 @@
 .textDisplay {
-    -unity-font-style: bold;
+    flex-grow: 0;
+}
+
+.textDisplay_container {
+    white-space: pre-wrap;
     flex-direction: row;
-    font-size: 100%;
+    flex-wrap: wrap;
 }
 
 .textDisplay_header {
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-left: 0;
+    padding-right: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    font-size: 100%;
+    flex-grow: 0;
+    -unity-text-align: upper-left;
+    flex-wrap: wrap;
+    white-space: pre-wrap;
 }
 
 .textDisplay_context {
+    flex-shrink: 1;
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-left: 0;
+    padding-right: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    flex-grow: 1;
+    -unity-text-align: upper-center;
+    flex-wrap: wrap;
+    white-space: pre-wrap;
 }

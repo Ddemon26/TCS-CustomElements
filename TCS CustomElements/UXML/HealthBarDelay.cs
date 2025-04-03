@@ -2,9 +2,11 @@
 using Unity.Properties;
 using UnityEngine;
 using UnityEngine.UIElements;
-namespace Source.UIToolkit.Elements {
-    [UxmlElement] public partial class HealthBarDelay : BindableElement, INotifyValueChanged<float> {
-        static readonly BindingId TitleProperty = (BindingId)nameof(Title);
+
+namespace TCS_CustomElements.TCS_CustomElements.UXML {
+    [UxmlElement]
+    public partial class HealthBarDelay : BindableElement, INotifyValueChanged<float> {
+        static readonly BindingId ShowTitleProperty = (BindingId)nameof(ShowTitle);
         static readonly BindingId LowValueProperty = (BindingId)nameof(LowValue);
         static readonly BindingId HighValueProperty = (BindingId)nameof(HighValue);
         static readonly BindingId ValueProperty = (BindingId)nameof(value);
@@ -29,130 +31,38 @@ namespace Source.UIToolkit.Elements {
         float m_highValue = 100f;
         float m_value;
         float m_delayedValue;
+        bool m_showTitle = true;
 
         public HealthBarDelay() {
             AddToClassList(USSClassName);
-            var child1 = new VisualElement {
-                name = "health-bar",
-            };
-            m_background = new VisualElement();
+            var child1 = new VisualElement { name = "health-bar" };
+            m_background = new VisualElement { name = "background" };
             m_background.AddToClassList(BackgroundUssClassName);
-            m_background.name = "background";
-            child1.Add(m_background);
-            m_delayedProgress = new VisualElement();
+            m_delayedProgress = new VisualElement { name = "delayed-progress" };
             m_delayedProgress.AddToClassList(DelayedProgressUssClassName);
-            m_delayedProgress.name = "delayed-progress";
-            m_background.Add(m_delayedProgress);
-            m_progress = new VisualElement();
+            m_progress = new VisualElement { name = "progress" };
             m_progress.AddToClassList(ProgressUssClassName);
-            m_progress.name = "progress";
+            m_background.Add(m_delayedProgress);
             m_background.Add(m_progress);
-            var child2 = new VisualElement {
-                name = "title-container",
-            };
+
+            var child2 = new VisualElement { name = "title-container" };
             child2.AddToClassList(TitleContainerUssClassName);
-            m_background.Add(child2);
-            m_title = new Label();
+            m_title = new Label { name = "title" };
             m_title.AddToClassList(TitleUssClassName);
-            m_title.name = "title";
             child2.Add(m_title);
+            m_background.Add(child2);
+
+            child1.Add(m_background);
             child1.AddToClassList(ContainerUssClassName);
             hierarchy.Add(child1);
-            RegisterCallback(new EventCallback<GeometryChangedEvent>(OnGeometryChanged));
-            
-            ColorValue = new Color(1.0f, 0.0f, 0.0f);
+            RegisterCallback<GeometryChangedEvent>(OnGeometryChanged);
+
+            ColorValue = new Color(1f, 0f, 0f);
+            ColorDelayValue = new Color(0f, 1f, 0f);
             LowValue = 0f;
             HighValue = 100f;
             value = 50f;
-            
-            ColorDelayValue = new Color(0.0f, 1.0f, 0.0f);
             DelayedValue = 50f;
-        }
-
-        [CreateProperty, UxmlAttribute("title")] public string Title {
-            get => m_title.text;
-            set {
-                string title = Title;
-                m_title.text = value;
-                if (string.CompareOrdinal(title, Title) == 0) {
-                    return;
-                }
-
-                NotifyPropertyChanged(TitleProperty);
-            }
-        }
-
-        [CreateProperty, UxmlAttribute("low-value")] public float LowValue {
-            get => m_lowValue;
-            set {
-                float lowValue = LowValue;
-                m_lowValue = value;
-                SetProgress(m_value);
-                if (Mathf.Approximately(lowValue, LowValue)) {
-                    return;
-                }
-
-                NotifyPropertyChanged(LowValueProperty);
-            }
-        }
-
-        [CreateProperty, UxmlAttribute("high-value")] public float HighValue {
-            get => m_highValue;
-            set {
-                float highValue = HighValue;
-                m_highValue = value;
-                SetProgress(m_value);
-                if (Mathf.Approximately(highValue, HighValue)) {
-                    return;
-                }
-
-                NotifyPropertyChanged(HighValueProperty);
-            }
-        }
-
-        void SetProgress(float p) {
-            if (p <= LowValue) {
-                m_progress.style.display = DisplayStyle.None;
-            }
-            else {
-                m_progress.style.display = DisplayStyle.Flex;
-                float progressWidth = CalculateProgressWidth(p >= LowValue ? (p <= HighValue ? p : HighValue) : LowValue);
-                if (progressWidth < 0.0) {
-                    return;
-                }
-
-                m_progress.style.right = progressWidth;
-            }
-        }
-
-        public void SetDelayedProgress(float p) {
-            if (p <= LowValue) {
-                m_delayedProgress.style.display = DisplayStyle.None;
-            }
-            else {
-                m_delayedProgress.style.display = DisplayStyle.Flex;
-                float progressWidth = CalculateProgressWidth(p >= LowValue ? (p <= HighValue ? p : HighValue) : LowValue);
-                if (progressWidth < 0.0) {
-                    return;
-                }
-
-                m_delayedProgress.style.right = progressWidth;
-            }
-        }
-
-        float CalculateProgressWidth(float width) {
-            if (m_background == null || m_progress == null) {
-                return 0.0f;
-            }
-
-            var backgroundLayout = m_background.layout;
-            if (float.IsNaN(backgroundLayout.width)) {
-                return 0.0f;
-            }
-
-            backgroundLayout = m_background.layout;
-            float num = backgroundLayout.width - 2f;
-            return num - Mathf.Max(num * width / HighValue, 1f);
         }
 
         void OnGeometryChanged(GeometryChangedEvent e) {
@@ -160,79 +70,125 @@ namespace Source.UIToolkit.Elements {
             SetDelayedProgress(DelayedValue);
         }
 
-        [CreateProperty, UxmlAttribute("value")] public float value {
+        [CreateProperty, UxmlAttribute("show-title")]
+        public bool ShowTitle {
+            get => m_showTitle;
+            set {
+                if (m_showTitle == value) return;
+                m_showTitle = value;
+                m_title.style.display = value ? DisplayStyle.Flex : DisplayStyle.None;
+                UpdateTitle();
+                NotifyPropertyChanged(ShowTitleProperty);
+            }
+        }
+
+        [CreateProperty, UxmlAttribute("low-value")]
+        public float LowValue {
+            get => m_lowValue;
+            set {
+                float old = m_lowValue;
+                m_lowValue = value;
+                SetProgress(m_value);
+                if (Mathf.Approximately(old, m_lowValue)) return;
+                NotifyPropertyChanged(LowValueProperty);
+            }
+        }
+
+        [CreateProperty, UxmlAttribute("high-value")]
+        public float HighValue {
+            get => m_highValue;
+            set {
+                float old = m_highValue;
+                m_highValue = value;
+                SetProgress(m_value);
+                if (Mathf.Approximately(old, m_highValue)) return;
+                NotifyPropertyChanged(HighValueProperty);
+            }
+        }
+
+        void SetProgress(float p) {
+            m_progress.style.display = p <= LowValue ? DisplayStyle.None : DisplayStyle.Flex;
+            float clamped = Mathf.Clamp(p, LowValue, HighValue);
+            float width = CalculateProgressWidth(clamped);
+            if (width >= 0f) m_progress.style.right = width;
+            UpdateTitle();
+        }
+
+        public void SetDelayedProgress(float p) {
+            m_delayedProgress.style.display = p <= LowValue ? DisplayStyle.None : DisplayStyle.Flex;
+            float clamped = Mathf.Clamp(p, LowValue, HighValue);
+            float width = CalculateProgressWidth(clamped);
+            if (width >= 0f) m_delayedProgress.style.right = width;
+        }
+
+        float CalculateProgressWidth(float width) {
+            if (m_background == null || m_progress == null) return 0f;
+            var bgWidth = m_background.layout.width;
+            if (float.IsNaN(bgWidth)) return 0f;
+            float full = bgWidth - 2f;
+            return full - Mathf.Max(full * width / HighValue, 1f);
+        }
+
+        [CreateProperty, UxmlAttribute("value")]
+        public float value {
             get => m_value;
             set {
-                if (EqualityComparer<float>.Default.Equals(m_value, value)) {
-                    return;
-                }
-
+                if (EqualityComparer<float>.Default.Equals(m_value, value)) return;
                 if (panel != null) {
-                    using ChangeEvent<float> pooled = ChangeEvent<float>.GetPooled(m_value, value);
+                    using var pooled = ChangeEvent<float>.GetPooled(m_value, value);
                     pooled.target = this;
                     SetValueWithoutNotify(value);
                     SendEvent(pooled);
                     NotifyPropertyChanged(ValueProperty);
-                }
-                else {
-                    SetValueWithoutNotify(value);
-                }
+                } else SetValueWithoutNotify(value);
             }
         }
 
-        [CreateProperty, UxmlAttribute("delayed-value")] public float DelayedValue {
+        [CreateProperty, UxmlAttribute("delayed-value")]
+        public float DelayedValue {
             get => m_delayedValue;
             set {
-                if (EqualityComparer<float>.Default.Equals(m_delayedValue, value)) {
-                    return;
-                }
-
+                if (EqualityComparer<float>.Default.Equals(m_delayedValue, value)) return;
                 if (panel != null) {
-                    using ChangeEvent<float> pooled = ChangeEvent<float>.GetPooled(m_delayedValue, value);
+                    using var pooled = ChangeEvent<float>.GetPooled(m_delayedValue, value);
                     pooled.target = this;
-                    m_delayedValue = value;
                     SetDelayValueWithoutNotify(value);
                     SendEvent(pooled);
                     NotifyPropertyChanged(DelayedValueProperty);
-                }
-                else {
-                    SetDelayValueWithoutNotify(value);
-                }
+                } else SetDelayValueWithoutNotify(value);
             }
         }
 
         public void SetValueWithoutNotify(float newValue) {
             m_value = newValue;
-            SetProgress(value);
+            SetProgress(m_value);
         }
 
         public void SetDelayValueWithoutNotify(float newDelayedValue) {
             m_delayedValue = newDelayedValue;
-            SetDelayedProgress(DelayedValue);
+            SetDelayedProgress(m_delayedValue);
         }
 
-        [CreateProperty, UxmlAttribute("color-value")] public Color ColorValue {
+        [CreateProperty, UxmlAttribute("color-value")]
+        public Color ColorValue {
             get => m_progress.resolvedStyle.backgroundColor;
             set {
-                if (m_progress == null) {
-                    return;
-                }
-
+                if (m_progress == null) return;
                 m_progress.style.backgroundColor = value;
                 NotifyPropertyChanged(ColorProperty);
             }
         }
 
-        [CreateProperty, UxmlAttribute("color-delay-value")] public Color ColorDelayValue {
+        [CreateProperty, UxmlAttribute("color-delay-value")]
+        public Color ColorDelayValue {
             get => m_delayedProgress.resolvedStyle.backgroundColor;
             set {
-                if (m_delayedProgress == null) {
-                    return;
-                }
-
+                if (m_delayedProgress == null) return;
                 m_delayedProgress.style.backgroundColor = value;
                 NotifyPropertyChanged(ColorDelayProperty);
             }
         }
+
+        void UpdateTitle() => m_title.text = ShowTitle ? $"{m_value}/{m_highValue}" : string.Empty;
     }
 }

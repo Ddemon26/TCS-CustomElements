@@ -1,0 +1,14 @@
+.textInput {
+    flex-shrink: 0;
+    flex-grow: 1;
+}
+
+.textInput_container {
+    flex-shrink: 0;
+    flex-grow: 1;
+}
+
+.battleInfo_stats-Column {
+    flex-grow: 1;
+    flex-direction: column;
+}
