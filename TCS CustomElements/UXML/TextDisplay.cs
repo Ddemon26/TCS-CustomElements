@@ -44,8 +44,8 @@ namespace TCS_CustomElements.TCS_CustomElements.UXML {
             Container.Add(TextHeader);
             Container.Add(TextContext);
 
-            HeaderValue = "HeaderUSS:";
-            value = "ContextUSS";
+            HeaderValue = "Header:";
+            value = "Context";
             AllCaps = true;
         }
 
