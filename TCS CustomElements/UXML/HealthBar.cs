@@ -101,7 +101,7 @@ namespace TCS_CustomElements.TCS_CustomElements.UXML {
 
         float CalculateProgressWidth(float width) {
             if (m_background == null || m_progress == null) return 0f;
-            var bgWidth = m_background.layout.width;
+            float bgWidth = m_background.layout.width;
             if (float.IsNaN(bgWidth)) return 0f;
             float full = bgWidth - 2f;
             return full - Mathf.Max(full * width / HighValue, 1f);
@@ -113,7 +113,7 @@ namespace TCS_CustomElements.TCS_CustomElements.UXML {
             set {
                 if (EqualityComparer<float>.Default.Equals(m_value, value)) return;
                 if (panel != null) {
-                    using var pooled = ChangeEvent<float>.GetPooled(m_value, value);
+                    using ChangeEvent<float> pooled = ChangeEvent<float>.GetPooled(m_value, value);
                     pooled.target = this;
                     SetValueWithoutNotify(value);
                     SendEvent(pooled);
